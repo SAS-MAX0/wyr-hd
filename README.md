@@ -35,3 +35,4 @@ Pictures in this project are just demonstration ones.
 
 - Most of the images were derived at Wallpaper Cave.
 - There were also some other images obtained in Shutterstock and iStock.
+- AI used for the readme!
