@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather - Palm Choice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="main-ui">
+        <header class="game-header">
+            <h1 id="question-text">Loading question...</h1>
+        </header>
+        <p id="feedback-text">Waiting for palm gesture...</p>
+        <button id="restart-button" style="display: none;">Play Again</button>
+    </div>
+
+    <main class="split-screen-container">
+        <section class="choice-section left" id="blue-option">
+            <div class="card">
+                <img id="image-left" src="" alt="Left option image">
+                <p id="option-left-text">Option A</p>
+            </div>
+        </section>
+
+        <section class="choice-section right" id="red-option">
+            <div class="card">
+                <img id="image-right" src="" alt="Right option image">
+                <p id="option-right-text">Option B</p>
+            </div>
+        </section>
+    </main>
+    <div class="divider">OR</div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
