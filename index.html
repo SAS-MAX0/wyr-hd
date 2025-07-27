@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Would You Rather - Palm Choice</title>
   <link rel="stylesheet" href="styles.css" />
-</head> #head section obviously which contains the links to the stylesheet and page title
+  <!-- head section obviously which contains the links to the stylesheet and page title -->
+</head>
 <body>
-  #this body section contains the main game UI like the generic 
-  Question text for the Web page along with the feedback message and other things including the webcam details to make sure it stays on top.  <div class="main-ui">
+  <!-- this body section contains the main game UI like the generic 
+       Question text for the Web page along with the feedback message and other things
+       including the webcam details to make sure it stays on top -->
+  <div class="main-ui">
     <header class="game-header">
       <h1 id="question-text">Loading question...</h1>
     </header>
@@ -16,7 +19,9 @@
     <button id="restart-button" style="display: none;">Play Again</button>
   </div>
 
-  <main class="split-screen-container"> #this part is for the page divider for both choices [left and right] with each side then containing the image and text in a card like thingy.
+  <!-- this part is for the page divider for both choices [left and right] 
+       with each side then containing the image and text in a card like thingy -->
+  <main class="split-screen-container">
     <section class="choice-section left" id="blue-option">
       <div class="card">
         <img id="image-left" src="" alt="Left option image">
@@ -32,10 +37,14 @@
     </section>
   </main>
 
-  <div class="divider">OR</div> #this is just to separate the page down the middle also showing the OR that is centered
+  <!-- this is just to separate the page down the middle also showing the OR that is centered -->
+  <div class="divider">OR</div>
 
+  <!-- this is the hidden webcam element -->
   <video id="webcam" autoplay playsinline muted width="640" height="480" style="display: none;"></video>
-#this is to load the scripts and MediaPipe libraries for hand tracking and the logic of the game and also gesture recognition.
+
+  <!-- this is to load the scripts and MediaPipe libraries for hand tracking 
+       and the logic of the game and also gesture recognition -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
