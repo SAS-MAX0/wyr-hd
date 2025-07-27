@@ -63,8 +63,48 @@ const questions = [
         blueOption: { image: "assets/superheroes/9.jpg", text: "Avengers" }, redOption: { image: "assets/superheroes/10.jpg", text: "Justice League" } }
 ];
 
+const videoElement = document.getElementById('webcam');
+
+const hands = new Hands({
+  locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+});
+
+hands.setOptions({
+  maxNumHands: 1,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+hands.onResults(onResults);
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    await hands.send({ image: videoElement });
+  },
+  width: 640,
+  height: 480
+});
+camera.start();
+
+function onResults(results) {
+  if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+    handleChoice('NEUTRAL');
+    return;
+  }
+
+  const wristX = results.multiHandLandmarks[0][0].x;
+
+  if (wristX < 0.35) {
+    handleChoice('LEFT');
+  } else if (wristX > 0.65) {
+    handleChoice('RIGHT');
+  } else {
+    handleChoice('NEUTRAL');
+  }
+}
+
 let currentQuestionIndex = 0;
-let userChoices = [];
 let choiceMadeThisRound = false;
 
 const questionText = document.getElementById('question-text');
@@ -81,98 +121,95 @@ const divider = document.querySelector('.divider');
 const video = document.getElementById('webcam');
 
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 function loadQuestion() {
-    if (currentQuestionIndex >= questions.length) {
-        showResult();
-        return;
-    }
+  if (currentQuestionIndex >= questions.length) {
+    showResult();
+    return;
+  }
 
-    const question = questions[currentQuestionIndex];
-    questionText.textContent = question.question;
+  const question = questions[currentQuestionIndex];
+  questionText.textContent = question.question;
+  optionLeftText.textContent = question.blueOption.text;
+  imageLeft.src = question.blueOption.image;
+  optionRightText.textContent = question.redOption.text;
+  imageRight.src = question.redOption.image;
 
-    optionLeftText.textContent = question.blueOption.text;
-    imageLeft.src = question.blueOption.image;
-
-    optionRightText.textContent = question.redOption.text;
-    imageRight.src = question.redOption.image;
-
-    blueOptionCard.classList.remove('selected');
-    redOptionCard.classList.remove('selected');
-    feedbackText.textContent = "Show your palm to make a choice...";
-    choiceMadeThisRound = false;
+  blueOptionCard.classList.remove('selected');
+  redOptionCard.classList.remove('selected');
+  feedbackText.textContent = "Show your palm to make a choice...";
+  choiceMadeThisRound = false;
 }
 
 function handleChoice(choice) {
-    if (choiceMadeThisRound || choice === 'NEUTRAL') return;
+  if (choiceMadeThisRound || choice === 'NEUTRAL') return;
 
-    choiceMadeThisRound = true;
+  choiceMadeThisRound = true;
 
-    if (choice === 'LEFT') {
-        blueOptionCard.classList.add('selected');
-        feedbackText.textContent = `You chose ${questions[currentQuestionIndex].blueOption.text}!`;
-    } else if (choice === 'RIGHT') {
-        redOptionCard.classList.add('selected');
-        feedbackText.textContent = `You chose ${questions[currentQuestionIndex].redOption.text}!`;
-    }
+  if (choice === 'LEFT') {
+    blueOptionCard.classList.add('selected');
+    feedbackText.textContent = `You chose ${questions[currentQuestionIndex].blueOption.text}!`;
+  } else if (choice === 'RIGHT') {
+    redOptionCard.classList.add('selected');
+    feedbackText.textContent = `You chose ${questions[currentQuestionIndex].redOption.text}!`;
+  }
 
-    setTimeout(() => {
-        currentQuestionIndex++;
-        loadQuestion();
-    }, 1800);
+  setTimeout(() => {
+    currentQuestionIndex++;
+    loadQuestion();
+  }, 1800);
 }
 
 function showResult() {
-    splitScreenContainer.style.display = 'none';
-    divider.style.display = 'none';
-    questionText.textContent = "Game Over!";
-    feedbackText.textContent = "Thanks for playing!";
-    restartButton.style.display = 'block';
+  splitScreenContainer.style.display = 'none';
+  divider.style.display = 'none';
+  questionText.textContent = "Game Over!";
+  feedbackText.textContent = "Thanks for playing!";
+  restartButton.style.display = 'block';
 }
 
 function startGame() {
-    shuffleArray(questions);
-    currentQuestionIndex = 0;
-    userChoices = [];
-    restartButton.style.display = 'none';
-    splitScreenContainer.style.display = 'flex';
-    divider.style.display = 'flex';
-    loadQuestion();
+  shuffleArray(questions);
+  currentQuestionIndex = 0;
+  restartButton.style.display = 'none';
+  splitScreenContainer.style.display = 'flex';
+  divider.style.display = 'flex';
+  loadQuestion();
 }
 
 async function setupWebcam() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        video.addEventListener('loadeddata', () => {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    video.addEventListener('loadeddata', () => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
-            setInterval(() => {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const data = canvas.toDataURL('image/jpeg', 0.5);
-                socket.emit('video_frame', data);
-            }, 200);
-        });
-    } catch (err) {
-        console.error("Error accessing webcam: ", err);
-        feedbackText.textContent = "Webcam access is required to play!";
-    }
+      setInterval(() => {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const data = canvas.toDataURL('image/jpeg', 0.5);
+        socket.emit('video_frame', data);
+      }, 200);
+    });
+  } catch (err) {
+    console.error("Error accessing webcam: ", err);
+    feedbackText.textContent = "Webcam access is required to play!";
+  }
 }
 
 socket.on('hand_update', function(data) {
-    handleChoice(data.choice);
+  handleChoice(data.choice);
 });
 
 socket.on('connect', function() {
-    console.log('Connected to server!');
+  console.log('Connected to server!');
 });
 
 restartButton.addEventListener('click', startGame);
