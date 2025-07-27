@@ -96,9 +96,9 @@ function onResults(results) {
   const wristX = results.multiHandLandmarks[0][0].x;
 
   if (wristX < 0.35) {
-    handleChoice('RIGHT');
-  } else if (wristX > 0.65) {
     handleChoice('LEFT');
+  } else if (wristX > 0.65) {
+    handleChoice('RIGHT');
   } else {
     handleChoice('NEUTRAL');
   }
