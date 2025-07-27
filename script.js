@@ -1,6 +1,6 @@
-const socket = io();
+const socket = io(); 
 
-const questions = [
+const questions = [ // starting the question array with the lefta nd right side choice and image
     {
         question: "Would you rather have unlimited bacon or unlimited donuts?",
         blueOption: { image: "assets/cars/1.jpg", text: "Bugatti" }, redOption: { image: "assets/cars/2.jpg", text: "Lamborghini" } },
@@ -63,7 +63,7 @@ const questions = [
         blueOption: { image: "assets/superheroes/9.jpg", text: "Avengers" }, redOption: { image: "assets/superheroes/10.jpg", text: "Justice League" } }
 ];
 
-const videoElement = document.getElementById('webcam');
+const videoElement = document.getElementById('webcam'); // Starts the webcam feed and also MediaPipe for hand tracking.
 
 const hands = new Hands({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
@@ -86,7 +86,7 @@ const camera = new Camera(videoElement, {
   height: 480
 });
 camera.start();
-
+// this is the logic to determine the user's position in relation to the screen width and triggers a choice.
 function onResults(results) {
   if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
     handleChoice('NEUTRAL');
@@ -104,6 +104,7 @@ function onResults(results) {
   }
 }
 
+// makes the initial state variable for the question progression.
 let currentQuestionIndex = 0;
 let choiceMadeThisRound = false;
 
@@ -120,6 +121,7 @@ const splitScreenContainer = document.querySelector('.split-screen-container');
 const divider = document.querySelector('.divider');
 const video = document.getElementById('webcam');
 
+//shuffles the question to make it feel new when you restart.
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -127,6 +129,7 @@ function shuffleArray(array) {
   }
 }
 
+//loads and display the current questions and options on the lage taht replaces the generic ones.
 function loadQuestion() {
   if (currentQuestionIndex >= questions.length) {
     showResult();
@@ -146,7 +149,7 @@ function loadQuestion() {
   choiceMadeThisRound = false;
 }
 
-function handleChoice(choice) {
+function handleChoice(choice) { // handles the choice when the palm is detected and then loads the question. Then it also higjlighy the choice the user picked.
   if (choiceMadeThisRound || choice === 'NEUTRAL') return;
 
   choiceMadeThisRound = true;
@@ -165,7 +168,7 @@ function handleChoice(choice) {
   }, 1800);
 }
 
-function showResult() {
+function showResult() { // shows the final screen results once all the 20 questions are completed.
   splitScreenContainer.style.display = 'none';
   divider.style.display = 'none';
   questionText.textContent = "Game Over!";
@@ -173,7 +176,7 @@ function showResult() {
   restartButton.style.display = 'block';
 }
 
-function startGame() {
+function startGame() { // Starts and restarts logic for the game
   shuffleArray(questions);
   currentQuestionIndex = 0;
   restartButton.style.display = 'none';
@@ -182,7 +185,7 @@ function startGame() {
   loadQuestion();
 }
 
-async function setupWebcam() {
+async function setupWebcam() { // captures the Webcam frames then send it for processing...
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
